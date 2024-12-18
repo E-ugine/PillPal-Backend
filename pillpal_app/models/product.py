@@ -1,7 +1,7 @@
 from pillpal_app.database import db
 from pillpal_app.models.user import User
 from datetime import datetime
-
+from sqlalchemy.orm import validates
 class Product(db.Model):
     __tablename__ = 'products'
     
@@ -12,6 +12,12 @@ class Product(db.Model):
     stock_quantity = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @validates('price')
+    def validates_price(self, key, price):
+        if price < 0:
+            raise ValueError('Price must be non-negative')
+        return price
     
 
     

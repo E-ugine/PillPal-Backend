@@ -19,7 +19,9 @@ def create_app():
 
     from pillpal_app.models.user import User
     from pillpal_app.models.product import Product
+    from pillpal_app.models.order import Order
+    from pillpal_app.models.order_item import OrderItem
+    from pillpal_app.models.payment import Payment
     
    
-
     return app
