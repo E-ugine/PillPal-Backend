@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from sqlalchemy.exc import IntegrityError 
+from sqlalchemy.exc import IntegrityError
 from pillpal_app.models.user import User
 from pillpal_app.database import db
 
@@ -68,3 +68,68 @@ def create_user():
         return jsonify({"error": "Username or email already exists"}), 400
 
     return jsonify(serialize_user(new_user)), 201
+
+# Update a user (PATCH)
+@user_blueprint.route('/<int:user_id>', methods=['PATCH'])
+def update_user(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json()
+
+    # Update fields if provided
+    if 'username' in data:
+        user.username = data['username']
+    if 'email' in data:
+        if '@' not in data['email']:
+            return jsonify({"error": "Invalid email format"}), 400
+        user.email = data['email']
+    if 'address' in data:
+        user.address = data['address']
+    if 'phone_number' in data:
+        if not data['phone_number'].isdigit():
+            return jsonify({"error": "Phone number must contain only digits"}), 400
+        user.phone_number = data['phone_number']
+    if 'password' in data:
+        user.set_password(data['password'])
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"error": "Username or email already exists"}), 400
+
+    return jsonify(serialize_user(user)), 200
+
+# Delete a user (DELETE)
+@user_blueprint.route('/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    try:
+        user = User.query.get(user_id)
+
+        # Check if the user exists
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        # Try to delete the user
+        try:
+            db.session.delete(user)
+            db.session.commit()
+            return jsonify({"message": "User deleted successfully"}), 200
+
+        except IntegrityError:
+            # Handle integrity errors (e.g., foreign key constraints)
+            db.session.rollback()
+            return jsonify({
+                "error": "Cannot delete user. Associated records exist."
+            }), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "error": f"An unexpected error occurred: {str(e)}"
+        }), 500
+
+        
+
