@@ -7,11 +7,9 @@ from pillpal_app.models.order_item import OrderItem
 from pillpal_app import create_app
 from datetime import datetime
 
-# Create app and bcrypt instance
 app = create_app()
 
 with app.app_context():
-    # Drop all existing tables and recreate them 
     db.drop_all()
     db.create_all()
 
