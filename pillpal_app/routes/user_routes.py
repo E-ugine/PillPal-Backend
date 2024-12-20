@@ -119,7 +119,7 @@ def delete_user(user_id):
             return jsonify({"message": "User deleted successfully"}), 200
 
         except IntegrityError:
-            # Handle integrity errors (e.g., foreign key constraints)
+            # If the user has associated orders, rollback the transaction and return an error
             db.session.rollback()
             return jsonify({
                 "error": "Cannot delete user. Associated records exist."

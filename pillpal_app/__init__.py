@@ -4,8 +4,8 @@ from pillpal_app.config import CoolConfig
 from pillpal_app.database import db
 from pillpal_app.routes.main_route import main_blueprint
 from pillpal_app.routes.user_routes import user_blueprint
-# from pillpal_app.routes.product_routes import product_blueprint
-# from pillpal_app.routes.order_routes import order_blueprint
+from pillpal_app.routes.product_routes import product_blueprint
+from pillpal_app.routes.order_routes import order_blueprint
 
 def create_app():    
     # Initialize Flask app
@@ -31,8 +31,8 @@ def create_app():
     # Register Blueprints
     app.register_blueprint(main_blueprint, url_prefix='/')
     app.register_blueprint(user_blueprint, url_prefix='/api/users')
-    # app.register_blueprint(product_blueprint, url_prefix='/api/products')
-    # app.register_blueprint(order_blueprint, url_prefix='/api/orders')
+    app.register_blueprint(product_blueprint, url_prefix='/api/products')
+    app.register_blueprint(order_blueprint, url_prefix='/api/orders')
 
     # Return the app instance
     return app
